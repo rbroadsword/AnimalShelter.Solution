@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AnimalShelter.Models;
@@ -37,7 +40,7 @@ namespace AnimalShelter.Controllers
     [HttpGet("{id}")]
         public async Task<ActionResult<Animal>> GetAnimal(int id)
         {
-            var animal = await _context.Animals.FindAsync(id);
+            var animal = await _db.Animals.FindAsync(id);
 
             if (animal == null)
             {
@@ -55,11 +58,11 @@ namespace AnimalShelter.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(animal).State = EntityState.Modified;
+            _db.Entry(animal).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -79,8 +82,8 @@ namespace AnimalShelter.Controllers
       [HttpPost]
         public async Task<ActionResult<Animal>> PostAnimal(Animal animal)
         {
-            _context.Animals.Add(animal);
-            await _context.SaveChangesAsync();
+            _db.Animals.Add(animal);
+            await _db.SaveChangesAsync();
 
             return CreatedAtAction("GetAnimal", new { id = animal.AnimalId }, animal);
         }
@@ -88,21 +91,21 @@ namespace AnimalShelter.Controllers
       [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAnimal(int id)
         {
-            var animal = await _context.Animals.FindAsync(id);
+            var animal = await _db.Animals.FindAsync(id);
             if (animal == null)
             {
                 return NotFound();
             }
 
-            _context.Animals.Remove(animal);
-            await _context.SaveChangesAsync();
+            _db.Animals.Remove(animal);
+            await _db.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool AnimalExists(int id)
         {
-            return _context.Animals.Any(e => e.AnimalId == id);
+            return _db.Animals.Any(e => e.AnimalId == id);
         }
   }
 }
